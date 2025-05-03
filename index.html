@@ -27,6 +27,7 @@
       max-width: 400px;
       width: 100%;
       text-align: center;
+      margin-bottom: 2rem;
     }
 
     .value {
@@ -41,78 +42,139 @@
       border-radius: 5px;
     }
 
-    .status.excellent {
-      background-color: #a5d6a7;
-      color: #1b5e20;
-    }
+    .status.excellent { background-color: #a5d6a7; color: #1b5e20; }
+    .status.good { background-color: #c8e6c9; color: #2e7d32; }
+    .status.fair { background-color: #fff9c4; color: #f9a825; }
+    .status.poor { background-color: #ffe0b2; color: #ef6c00; }
+    .status.unacceptable { background-color: #ffccbc; color: #d84315; }
+    .status.nowater { background-color: #eeeeee; color: #757575; }
 
-    .status.good {
-      background-color: #c8e6c9;
-      color: #2e7d32;
-    }
-
-    .status.fair {
-      background-color: #fff9c4;
-      color: #f9a825;
-    }
-
-    .status.poor {
-      background-color: #ffe0b2;
-      color: #ef6c00;
-    }
-
-    .status.unacceptable {
-      background-color: #ffccbc;
-      color: #d84315;
-    }
-
-    .status.nowater {
-      background-color: #eeeeee;
-      color: #757575;
-    }
-
-    .facts {
-      margin-top: 2rem;
+    table {
+      border-collapse: collapse;
+      margin-top: 1rem;
+      width: 80%;
       max-width: 600px;
+    }
+
+    th, td {
+      border: 1px solid #004d40;
+      padding: 8px 12px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #004d40;
+      color: white;
+    }
+
+    .about-section {
+      margin-top: 3rem;
+      max-width: 800px;
+      width: 100%;
       background: #ffffff;
-      padding: 1.5rem;
+      padding: 2rem;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      text-align: left;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .facts h2 {
-      margin-top: 0;
+    .about-section h2 {
+      color: #004d40;
+      margin-bottom: 1rem;
     }
 
-    .facts ul {
-      padding-left: 1.5rem;
+    .about-section p {
+      margin-bottom: 1rem;
+      line-height: 1.6;
     }
+
+    .about-section ul {
+      margin-left: 1.5rem;
+    }
+
+    .about-section ul li {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 1rem;
+      color: #004d40;
+    }
+
   </style>
 </head>
 <body>
   <h1>Water Quality Monitor</h1>
-  <div class="card">
+  <div class="card" id="dataCard">
     <div class="value" id="temperature">Temperature: -- °C</div>
     <div class="value" id="ec">EC: -- µS/cm</div>
     <div class="value" id="tds">TDS: -- mg/L</div>
     <div class="status" id="quality">Quality: --</div>
   </div>
 
-  <div class="facts">
-    <h2>Why Water Quality Matters</h2>
+  <div id="noData" style="display:none; color: red; font-weight: bold;">No reading detected in the last 30 seconds!</div>
+
+  <h2>Water Quality Classification</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>TDS Range (mg/L)</th>
+        <th>Water Quality</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>&lt; 300</td><td>Excellent</td></tr>
+      <tr><td>300 - 599</td><td>Good</td></tr>
+      <tr><td>600 - 899</td><td>Fair</td></tr>
+      <tr><td>900 - 1199</td><td>Poor</td></tr>
+      <tr><td>&ge; 1200</td><td>Unacceptable</td></tr>
+    </tbody>
+  </table>
+
+  <div class="about-section">
+    <h2>About the Project</h2>
+    <p>This project focuses on monitoring and displaying the quality of drinking water in real time using IoT technology. The system is designed to check important parameters like Temperature, Electrical Conductivity (EC), and Total Dissolved Solids (TDS), which are key indicators of water quality. The data is collected using an ESP32-based microcontroller, processed, and displayed on a web interface. This helps users ensure safe water quality, suitable for consumption.</p>
+    
+    <h3>Key Features</h3>
     <ul>
-      <li>EC (Electrical Conductivity) indicates the amount of dissolved salts and is used to assess water purity.</li>
-      <li>TDS (Total Dissolved Solids) should generally be below 500 mg/L for safe drinking water, per WHO guidelines.</li>
-      <li>Water temperature affects dissolved oxygen levels and biological activity in natural waters.</li>
-      <li>High TDS or EC can indicate contamination from sewage, fertilizers, or industrial waste.</li>
+      <li>Real-time monitoring of water quality parameters.</li>
+      <li>Easy-to-understand classification of water quality based on TDS levels.</li>
+      <li>Notification when no data is received for a specified duration.</li>
+      <li>Web interface with live data updates every 15 seconds.</li>
+      <li>Powered by IoT technologies (ESP32 and ThingSpeak API integration).</li>
     </ul>
+
+    <h3>Components Used</h3>
+    <ul>
+      <li><strong>ESP32 Microcontroller:</strong> The core of the system that collects and transmits data to the cloud.</li>
+      <li><strong>TDS Sensor:</strong> Measures the Total Dissolved Solids in the water to gauge its purity.</li>
+      <li><strong>EC Sensor:</strong> Measures the Electrical Conductivity (EC) of water to determine the presence of dissolved ions.</li>
+      <li><strong>Temperature Sensor:</strong> Measures the temperature of the water.</li>
+      <li><strong>ThingSpeak:</strong> A cloud platform to store and visualize data from IoT devices.</li>
+    </ul>
+
+    <h3>How It Works</h3>
+    <p>The water quality is monitored using sensors connected to the ESP32 microcontroller. The system reads the TDS, EC, and temperature values at regular intervals and sends them to the ThingSpeak platform. The data is then retrieved and displayed on a web interface, providing users with up-to-date information on water quality. Based on the TDS levels, the water quality is classified into different categories like Excellent, Good, Fair, Poor, or Unacceptable.</p>
+
+    <h3>Applications</h3>
+    <ul>
+      <li>Monitoring drinking water quality in households.</li>
+      <li>Water quality analysis in aquariums, pools, and other water bodies.</li>
+      <li>Used in research and environmental monitoring projects.</li>
+      <li>Ensuring safe water for industrial and agricultural applications.</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    <p>© 2025 Water Quality Monitor Project | Developed by [Your Name]</p>
   </div>
 
   <script>
     const channelId = '2946225';
     const readApiKey = 'X28WFDZVATGQ1ZVM';
     const apiUrl = `https://api.thingspeak.com/channels/${channelId}/feeds.json?api_key=${readApiKey}&results=1`;
+    let lastTimestamp = null;
 
     function getWaterQualityStatus(tds, voltage) {
       if (voltage < 0.2) {
@@ -135,6 +197,15 @@
         const response = await fetch(apiUrl);
         const data = await response.json();
         const feed = data.feeds[0];
+        const timestamp = new Date(feed.created_at);
+
+        if (lastTimestamp && (new Date() - new Date(lastTimestamp)) > 30000) {
+          document.getElementById('noData').style.display = 'block';
+        } else {
+          document.getElementById('noData').style.display = 'none';
+        }
+
+        lastTimestamp = timestamp;
 
         const temperature = parseFloat(feed.field1);
         const ecValue = parseFloat(feed.field2);
@@ -151,6 +222,7 @@
         qualityDiv.className = `status ${quality.class}`;
       } catch (error) {
         console.error('Error fetching data:', error);
+        document.getElementById('noData').style.display = 'block';
       }
     }
 
