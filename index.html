@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Water Quality Monitor</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #e0f2f1);
+      color: #004d40;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 2rem;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .value {
+      font-size: 2rem;
+      margin: 0.5rem 0;
+    }
+
+    .status {
+      font-weight: bold;
+      margin-top: 1rem;
+      padding: 0.5rem;
+      border-radius: 5px;
+    }
+
+    .status.excellent {
+      background-color: #a5d6a7;
+      color: #1b5e20;
+    }
+
+    .status.good {
+      background-color: #c8e6c9;
+      color: #2e7d32;
+    }
+
+    .status.fair {
+      background-color: #fff9c4;
+      color: #f9a825;
+    }
+
+    .status.poor {
+      background-color: #ffe0b2;
+      color: #ef6c00;
+    }
+
+    .status.unacceptable {
+      background-color: #ffccbc;
+      color: #d84315;
+    }
+
+    .status.nowater {
+      background-color: #eeeeee;
+      color: #757575;
+    }
+
+    .facts {
+      margin-top: 2rem;
+      max-width: 600px;
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: left;
+    }
+
+    .facts h2 {
+      margin-top: 0;
+    }
+
+    .facts ul {
+      padding-left: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Water Quality Monitor</h1>
+  <div class="card">
+    <div class="value" id="temperature">Temperature: -- °C</div>
+    <div class="value" id="ec">EC: -- µS/cm</div>
+    <div class="value" id="tds">TDS: -- mg/L</div>
+    <div class="status" id="quality">Quality: --</div>
+  </div>
+
+  <div class="facts">
+    <h2>Why Water Quality Matters</h2>
+    <ul>
+      <li>EC (Electrical Conductivity) indicates the amount of dissolved salts and is used to assess water purity.</li>
+      <li>TDS (Total Dissolved Solids) should generally be below 500 mg/L for safe drinking water, per WHO guidelines.</li>
+      <li>Water temperature affects dissolved oxygen levels and biological activity in natural waters.</li>
+      <li>High TDS or EC can indicate contamination from sewage, fertilizers, or industrial waste.</li>
+    </ul>
+  </div>
+
+  <script>
+    const channelId = '2946225';
+    const readApiKey = 'X28WFDZVATGQ1ZVM';
+    const apiUrl = `https://api.thingspeak.com/channels/${channelId}/feeds.json?api_key=${readApiKey}&results=1`;
+
+    function getWaterQualityStatus(tds, voltage) {
+      if (voltage < 0.2) {
+        return { label: "No Water Detected", class: "nowater" };
+      } else if (tds < 300) {
+        return { label: "Excellent", class: "excellent" };
+      } else if (tds < 600) {
+        return { label: "Good", class: "good" };
+      } else if (tds < 900) {
+        return { label: "Fair", class: "fair" };
+      } else if (tds < 1200) {
+        return { label: "Poor", class: "poor" };
+      } else {
+        return { label: "Unacceptable", class: "unacceptable" };
+      }
+    }
+
+    async function fetchData() {
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        const feed = data.feeds[0];
+
+        const temperature = parseFloat(feed.field1);
+        const ecValue = parseFloat(feed.field2);
+        const voltage = ecValue / 2; // Assuming conversionFactor = 0.5
+        const tds = ecValue * 0.5;
+
+        document.getElementById('temperature').textContent = `Temperature: ${temperature.toFixed(2)} °C`;
+        document.getElementById('ec').textContent = `EC: ${ecValue.toFixed(2)} µS/cm`;
+        document.getElementById('tds').textContent = `TDS: ${tds.toFixed(2)} mg/L`;
+
+        const quality = getWaterQualityStatus(tds, voltage);
+        const qualityDiv = document.getElementById('quality');
+        qualityDiv.textContent = `Quality: ${quality.label}`;
+        qualityDiv.className = `status ${quality.class}`;
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    fetchData();
+    setInterval(fetchData, 15000); // Update every 15 seconds
+  </script>
+</body>
+</html>
